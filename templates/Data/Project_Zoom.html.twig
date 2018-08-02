@@ -1,0 +1,21 @@
+<div class="modal-dialog modal-lg">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+        <div class="modal-header">
+            <h4 class="modal-title">{{ data.name }}</h4><h6 class="modal-title">{{ data.date|date("m/d/Y") }}</h6>
+        </div>
+        <div class="modal-body">
+            <p id="text_modal">{{ data.description }}</p>
+            <div class="photo">
+                {% for photo in data.photos %}
+                <img src="{{ asset('uploads/Photo/' ~ photo.file) }}" class="rounded mx-auto d-block">
+                {% endfor %}
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
+        </div>
+    </div>
+
+</div>

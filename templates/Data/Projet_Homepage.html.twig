@@ -1,0 +1,98 @@
+{% extends "AdminLayout.html.twig" %}
+
+
+{% block card_title %} Gestionaire : Project <a class="text-right" href="#" data-toggle="modal" data-target="#form_modal"> <i class="now-ui-icons ui-1_simple-add"></i></a>{% endblock %}
+
+{% block body %}
+
+
+    <div class="table-responsive">
+        <table class="table">
+            <thead class=" text-primary">
+            <tr>
+                <th>
+                    id
+                </th>
+                <th>
+                    Nom
+                </th>
+                <th>
+                    date
+                </th>
+                <th>
+                    like
+                </th>
+                <th>
+                    tag
+                </th>
+                <th>
+                    photo
+                </th>
+                <th class="text-right">
+                    Action
+                </th>
+            </tr></thead>
+            <tbody id="liste">
+            {% for data in projects %}
+                <tr>
+                    <td>{{ data.id }}</td>
+                    <td>{{ data.name }}</td>
+                    <td>{{ data.date|date("m/d/Y") }}</td>
+                    <td>{{ data.heart}}</td>
+                    <td>{% for tag in data.tags %} {{ tag.name}} {% endfor %}</td>
+                    <td>{{ data.photos|length}}</td>
+                    <td class="text-right">
+                        <a href="{{ path('Project_zoom',{'id' : data.id}) }}" class="zoom"> <i class="now-ui-icons ui-1_zoom-bold"></i></a>
+                        <a href=""> <i class="now-ui-icons media-1_camera-compact"></i></a>
+                        <a href=""> <i class="now-ui-icons ui-1_settings-gear-63"></i></a>
+                        <a class="delete" href=""> <i class="now-ui-icons ui-1_simple-remove"></i></a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+{% endblock %}
+
+
+{% block modal_body %}
+
+    {{ form_start(form) }}
+            <div class="modal-header">
+                <h4 class="modal-title">Nouveau Projet</h4>
+            </div>
+            <div class="modal-body">
+        {{ form_widget(form) }}
+            </div>
+            <div class="modal-footer">
+                <button id="submit" name="submit" class="btn btn-success">Valider</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
+            </div>
+    {{ form_end(form) }}
+
+{% endblock %}
+
+{% block JS %}
+    {{ parent() }}
+    <script>
+        $(document).ready(function(){
+            console.log("ready");
+
+            var $supression = "<div class=\"modal-dialog\"><div class=\"modal-content\"><div class=\"modal-header\"><h4 class=\"modal-title\">Suppression</h4></div><div class=\"modal-body\"><p id=\"text_modal\">Some text in the modal.</p></div><div class=\"modal-footer\"><button type=\"button\" id=\"valid_supr\" class=\"btn btn-success\" data-dismiss=\"modal\">valider</button><button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Annuler</button></div></div></div>"
+            $(".zoom").click(function (e) {
+                console.log('click');
+                e.preventDefault();
+                var $link = $(this).attr("href");
+                $.ajax({
+                    method: 'POST',
+                    url: $link
+                }).done(function ($data) {
+                    console.log('done');
+                    $('#current_modal').html($data);
+                    $('#current_modal').modal();
+                })
+            })
+        });
+    </script>
+{% endblock %}

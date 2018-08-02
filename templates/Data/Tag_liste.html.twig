@@ -1,0 +1,13 @@
+{% for data in datas %}
+<tr>
+    <td>{{ data.id }}</td>
+    <td>{{ data.name }}</td>
+    <td>
+        {% if data.etat %} <i class="now-ui-icons ui-1_check"></i> {% endif %}
+    </td>
+    <td class="text-right">
+        <a href="#"> <i class="now-ui-icons ui-1_settings-gear-63"></i></a>
+        <a class="tag_delete_button" data-id="{{ data.name }}" href="{{ path('Tag_delete',{id:data.id}) }}"> <i class="now-ui-icons ui-1_simple-remove"></i></a>
+    </td>
+</tr>
+{% endfor %}

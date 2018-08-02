@@ -1,0 +1,139 @@
+{% extends 'AdminLayout.html.twig' %}
+
+{% block card_title %} Gestionaire : Tag <a class="text-right" href="#" data-toggle="modal" data-target="#form_modal"> <i class="now-ui-icons ui-1_simple-add"></i></a>{% endblock %}
+
+{% block body %}
+
+    <div class="table-responsive">
+        <table class="table">
+            <thead class=" text-primary">
+            <tr>
+                <th>
+                    id
+                </th>
+                <th>
+                    Nom
+                </th>
+                <th>
+                    Etat
+                </th>
+                <th class="text-right">
+                    Action
+                </th>
+            </tr></thead>
+            <tbody id="liste">
+            {% for data in datas %}
+            <tr>
+                <td>{{ data.id }}</td>
+                <td>{{ data.name }}</td>
+                <td>
+                    {% if data.etat %} <i class="now-ui-icons ui-1_check"></i> {% endif %}
+                </td>
+                <td class="text-right">
+                    <a href=""> <i class="now-ui-icons ui-1_settings-gear-63"></i></a>
+                    <a class="tag_delete_button" data-id="{{ data.name }}" href="{{ path('Tag_delete',{id:data.id}) }}"> <i class="now-ui-icons ui-1_simple-remove"></i></a>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+{% endblock %}
+
+{% block JS %}
+    {{ parent() }}
+    <script>
+        $(document).ready(function(){
+            console.log('document ready');
+            $('.New_Tag').submit(function(e) {
+                e.preventDefault();
+                var $link = $(e.currentTarget);
+                $('#form_modal').modal('toggle');
+                $.ajax({
+                    method : 'POST',
+                    url : $link.attr('href'),
+                    data : {name :$('#name').val(), descript:$('#descript').val(), etat:$('#tag_etat-0').val()}
+                }).done(function (data) {
+                    $('#liste').html(data);
+                    $('#name').val("");
+                    $('#descript').val("");
+                    $('#tag_etat-0').val("");
+                })
+            });
+
+            $('.tag_delete_button').click(function (e) {
+                e.preventDefault();
+                var $link = $(this).attr("href");
+                $('#text_modal').html("Voulez vous vraiment supprimer le tag : " + $(this).attr("data-id"));
+                $('#current_modal').modal('toggle');
+                $('#valid_supr').click(function () {
+                    console.log('valid');
+                    $.ajax({
+                        method: 'POST',
+                        url:$link
+                    }).done(function (data) {
+                        $('#liste').html(data);
+                    })
+                })
+
+            });
+
+        })
+    </script>
+{% endblock %}
+
+
+{% block modal_body %}
+
+    <form class="New_Tag" href="{{ path('Tag_create') }}">
+        <fieldset>
+            <div class="modal-header">
+                <h4 class="modal-title">Nouveau tag</h4>
+            </div>
+            <div class="modal-body">
+                <!-- Text input-->
+                <div class="form-group">
+                    <label class="col-md-12 control-label" for="name"></label>
+                    <div class="col-md-12">
+                        <input id="name" name="name" type="text" placeholder="nom du tag" class="form-control input-md" required="">
+
+                    </div>
+                </div>
+
+                <!-- Textarea -->
+                <div class="form-group">
+                    <label class="col-md-12 control-label" for="descript"></label>
+                    <div class="col-md-12">
+                        <textarea class="form-control" id="descript" name="descript">Description</textarea>
+                    </div>
+                </div>
+
+                <!-- Multiple Checkboxes -->
+                <div class="form-group">
+                    <label class="col-md-12 control-label" for="tag_etat"></label>
+                    <div class="col-md-12">
+
+
+                        <div class="form-check mt-3">
+                            <label class="form-check-label">
+                                <input class="form-check-input" type="checkbox"  name="tag_etat" id="tag_etat-0" value="1">
+                                <span class="form-check-sign"></span>
+                                Tete d'affiche
+                            </label>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button id="submit" name="submit" class="btn btn-success">Valider</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
+            </div>
+
+
+        </fieldset>
+    </form>
+
+{% endblock %}

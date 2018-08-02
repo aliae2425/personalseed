@@ -1,0 +1,14 @@
+{% extends "AdminLayout.html.twig" %}
+
+
+{% block body %}
+{{  form_start(form) }}
+
+        <div class="form-group">
+            {{ form_row(form.file) }}
+        </div>
+
+        <input type="submit" value="Envoyer le formulaire">
+{{ form_end(form) }}
+
+{% endblock %}

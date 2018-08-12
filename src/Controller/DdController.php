@@ -16,6 +16,7 @@ use App\Entity\Tag;
 use App\Form\PhotoType;
 use App\Form\ProjectType;
 
+use App\Form\TagType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -44,21 +45,35 @@ class DdController extends AbstractController
     /**
      * @Route("/data/tag", name="Tag_homePage")
      */
-    public function Tag_homepage()
-    {
-        $repo = $this->getDoctrine()->getRepository(Tag::class);
-        $data = $repo->findAll();
-        return $this->render("Data/Tag_HomePage.html.twig", ["datas" => $data]);
+    public function Tag_homepage(Request $request){
+        $doc = $this->getDoctrine();
+
+        $data = $doc->getRepository(Tag::class)->findAll();
+        $tag = new  Tag();
+
+        $form = $this->createForm( TagType::class, $tag);
+        $form->handleRequest($request);
+
+
+
+        return $this->render("Data/Tag_HomePage.html.twig", ["datas" => $data, 'modal' => 0, 'form'=>$form->createView()]);
     }
 
-    /**
+
+    /*
      * @Route("/data/tag/create", name="Tag_create", methods={"POST"})
-     */
+     *
     public function Tag_Create(Request $request){
         $doc = $this->getDoctrine();
 
         $em = $doc->getManager();
-        $product = new Tag();
+        $product = new Tag(); if ($form->isSubmitted() && $form->isValid()) {
+            $em = $doc->getManager();
+            $em->persist($tag);
+            $em->flush();
+
+            return $this->redirect($this->generateUrl('Tag_homePage'));
+        }
         $product->setName($request->request->get('name'));
         $product->setDescription($request->request->get('descript'));
         if ( $request->request->get('etat') == 1 ){
@@ -72,6 +87,7 @@ class DdController extends AbstractController
 
         return $this->render("Data/Tag_liste.html.twig",["datas"=>$data]);
     }
+    */
 
     /**
      * @Route("/data/tag/{id}/delete", name="Tag_delete", methods={"POST"})
@@ -89,15 +105,40 @@ class DdController extends AbstractController
         return $this->render("Data/Tag_liste.html.twig",["datas"=>$data]);
     }
 
-    /*
-     * @Route("/data/tag/{id}/update", name="Tag_update", methods={POST})
+    /**
+     * @Route("/data/tag/{id}/update", name="Tag_Update")
      */
-    /*
-    public function Tag_update($id, Request $request){
+    public function Tag_Update($id , Request $request ){
+        $em = $this->getDoctrine()->getManager();
+        $tag = $em->getRepository(Tag::class)->find($id);
 
+        if( null === $tag){
+            throw $this->createNotFoundException('Tag n\'existe pas');
+        }
+
+        $form = $this->createForm(TagType::class, $tag);
+
+        var_dump($form->isSubmitted());
+
+
+        if ($form->isSubmitted() && $form->isValid()) {
+
+            //$em->flush();
+
+            return $this->redirect($this->generateUrl('Tag_homePage'));
+        }
+
+
+        $data= $em->getRepository(Tag::class)->findAll();
+
+        return $this->render("Data/Tag_HomePage.html.twig", ["datas" => $data, 'modal' => 1, 'form'=>$form->createView()]);
     }
-    */
 
+
+
+    /*
+     * ========== Photo ==========
+     */
     /**
      * @Route("/data/photo", name="Photo_HomePage")
      */

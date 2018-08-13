@@ -30,8 +30,8 @@
                     {% if data.etat %} <i class="now-ui-icons ui-1_check"></i> {% endif %}
                 </td>
                 <td class="text-right">
-                    <a href="{{ path('Tag_Update', {id:data.id}) }}"> <i class="now-ui-icons ui-1_settings-gear-63"></i></a>
-                    <a class="tag_delete_button" onclick="DepletedTag(this, event, '{{ data.name }}');" href="{{ path('Tag_delete',{id:data.id}) }}"> <i class="now-ui-icons ui-1_simple-remove"></i></a>
+                    <a onclick="UpdateTag(this, event);" href="{{ path('Tag_Update', {id:data.id}) }}"> <i class="now-ui-icons ui-1_settings-gear-63"></i></a>
+                    <a onclick="DepletedTag(this, event, '{{ data.name }}');" href="{{ path('Tag_delete',{id:data.id}) }}"> <i class="now-ui-icons ui-1_simple-remove"></i></a>
                 </td>
             </tr>
             {% endfor %}
@@ -45,19 +45,45 @@
     {{ parent() }}
     <script>
 
-        $(document).ready(function () {
-            if ({{ modal }} == 1){
-                $('#form_modal').modal();
-            }
-        });
+        function UpdateTag($this, e) {
+            var $link = $($this).attr("href");
+            console.log('update click');
+            console.info($link);
+            e.preventDefault();
+           $.ajax({
+                method: 'GET',
+                url: $link
+           }).done(function ($data){
+                console.log("done");
+                $("#modal-container").html($data);
+                $("#form_modal").modal();
+
+
+                // ========== form post =====
+
+               $("#submit").on('submit',function(event){
+                   event.preventDefault();
+                   var datas= $( this ).serialize();
+                   var target = $(this).attr("action");
+                   $.ajax({
+                       url: target,
+                       data: datas
+                   }).done(function ($data) {
+                       $("#modal-container").html($data);
+                   });
+               });
+
+
+            });
+        }
 
         function DepletedTag($this, e, $name) {
-            console.log($this);
             e.preventDefault();
-            var $link = $this.getAttribute('href');
+            var $link = $($this).attr('href');
             $('#text_modal').html("Voulez vous vraiment supprimer le tag : " + $name);
             $('#current_modal').modal('toggle');
             $('#valid_supr').click(function () {
+                console.log($link);
                 $('#liste').html('<td colspan="4"><img src="{{ asset('img/load.gif') }}" class="rounded mx-auto d-block" style="height: 50px;"></td>');
                 $.ajax({
                     method: 'POST',

@@ -54,40 +54,17 @@ class DdController extends AbstractController
         $form = $this->createForm( TagType::class, $tag);
         $form->handleRequest($request);
 
-
-
-        return $this->render("Data/Tag_HomePage.html.twig", ["datas" => $data, 'modal' => 0, 'form'=>$form->createView()]);
-    }
-
-
-    /*
-     * @Route("/data/tag/create", name="Tag_create", methods={"POST"})
-     *
-    public function Tag_Create(Request $request){
-        $doc = $this->getDoctrine();
-
-        $em = $doc->getManager();
-        $product = new Tag(); if ($form->isSubmitted() && $form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $doc->getManager();
             $em->persist($tag);
             $em->flush();
 
             return $this->redirect($this->generateUrl('Tag_homePage'));
         }
-        $product->setName($request->request->get('name'));
-        $product->setDescription($request->request->get('descript'));
-        if ( $request->request->get('etat') == 1 ){
-            $product->setEtat(true);
-        }
 
-        $em->persist($product);
-        $em->flush();
 
-        $data= $doc->getRepository(Tag::class)->findAll();
-
-        return $this->render("Data/Tag_liste.html.twig",["datas"=>$data]);
+        return $this->render("Data/tag/Tag_HomePage.html.twig", ["datas" => $data, 'modal' => 0, 'form'=>$form->createView()]);
     }
-    */
 
     /**
      * @Route("/data/tag/{id}/delete", name="Tag_delete", methods={"POST"})
@@ -102,7 +79,7 @@ class DdController extends AbstractController
 
         $data= $doc->getRepository(Tag::class)->findAll();
 
-        return $this->render("Data/Tag_liste.html.twig",["datas"=>$data]);
+        return $this->render("Data/tag/Tag_liste.html.twig",["datas"=>$data]);
     }
 
     /**
@@ -117,21 +94,14 @@ class DdController extends AbstractController
         }
 
         $form = $this->createForm(TagType::class, $tag);
-
-        var_dump($form->isSubmitted());
-
+        $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-
-            //$em->flush();
-
-            return $this->redirect($this->generateUrl('Tag_homePage'));
+            $em->flush();
+            return new Response("Le tag "+ $id +" à été modifié");
         }
 
-
-        $data= $em->getRepository(Tag::class)->findAll();
-
-        return $this->render("Data/Tag_HomePage.html.twig", ["datas" => $data, 'modal' => 1, 'form'=>$form->createView()]);
+        return $this->render("Data/tag/Tag_Update.html.twig", ['form'=>$form->createView()]);
     }
 
 
@@ -174,7 +144,7 @@ class DdController extends AbstractController
 
         }
 
-        return $this->render('Data/Photo_form.html.twig', array(
+        return $this->render('Data/Project/Photo_form.html.twig', array(
             'form' => $form->createView(),
         ));
     }
@@ -232,7 +202,7 @@ class DdController extends AbstractController
             $retour = ['code'=> 1];
         }
 
-        return $this->render("Data/Projet_Homepage.html.twig",['projects'=>$data, 'form'=>$form->createView(),'retour'=>$retour]);
+        return $this->render("Data/Project/Projet_Homepage.html.twig",['projects'=>$data, 'form'=>$form->createView(),'retour'=>$retour]);
     }
 
     /**
@@ -240,7 +210,7 @@ class DdController extends AbstractController
      */
     public function Project_Zoom($id){
         $project = $this->getDoctrine()->getRepository(Project::class)->find($id);
-        return $this->render("Data/Project_Zoom.html.twig",["data"=>$project]);
+        return $this->render("Data/Project/Project_Zoom.html.twig",["data"=>$project]);
     }
 
 }

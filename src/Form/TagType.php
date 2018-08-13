@@ -21,7 +21,7 @@ class TagType extends AbstractType
                 'attr' => ['class' => 'form-control']
             ])
             ->add('Description', TextareaType::class,[
-                'label' => 'Nom du tag',
+                'label' => 'Description du tag',
                 'attr' => ['class' => 'form-control']
             ])
             ->add('Etat', ChoiceType::class, [

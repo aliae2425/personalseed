@@ -1,0 +1,26 @@
+{% extends "AdminLayout.html.twig" %}
+
+
+{% block card_title %} Gestionaire : Project <a class="text-right" href="#" data-toggle="modal" data-target="#form_modal"> <i class="now-ui-icons ui-1_simple-add"></i></a>{% endblock %}
+
+{% block body %}
+
+
+
+{% endblock %}
+
+
+{% block modal_body %}
+
+
+{% endblock %}
+
+
+{% block JS %}
+    {{ parent() }}
+    <script>
+        $(document).ready(function() {
+            console.log("ready");
+        }
+    </script>
+{% endblock %}

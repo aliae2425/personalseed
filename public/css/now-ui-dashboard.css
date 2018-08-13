@@ -3799,11 +3799,12 @@ Created using IcoMoon - icomoon.io
   width: 100%;
 }
 
+/*
 .table-responsive {
   overflow: scroll;
   padding-bottom: 10px;
 }
-
+*/
 #tables .table-responsive {
   margin-bottom: 30px;
 }

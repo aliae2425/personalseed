@@ -93,12 +93,17 @@ class DdController extends AbstractController
             throw $this->createNotFoundException('Tag n\'existe pas');
         }
 
-        $form = $this->createForm(TagType::class, $tag);
+        #$form = $this->createForm(TagType::class, $tag);
+        $form = $this->get("form.factory")
+            ->create(TagType::class, $tag,
+                ['action'=> $this->generateUrl("Tag_Update", ['id'=> $id])]
+            );
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
+
+        if ($form->isSubmitted() && $form->isValid()){
             $em->flush();
-            return new Response("Le tag "+ $id +" à été modifié");
+            return new Response('', Response::HTTP_NO_CONTENT);
         }
 
         return $this->render("Data/tag/Tag_Update.html.twig", ['form'=>$form->createView()]);

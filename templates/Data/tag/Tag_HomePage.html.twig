@@ -61,15 +61,22 @@
 
                 // ========== form post =====
 
-               $("#submit").on('submit',function(event){
+               $("form").submit(function(event){
                    event.preventDefault();
+                   console.log(event);
+                   stop();
                    var datas= $( this ).serialize();
                    var target = $(this).attr("action");
                    $.ajax({
+                       method : 'POST',
                        url: target,
                        data: datas
-                   }).done(function ($data) {
-                       $("#modal-container").html($data);
+                   }).done(function ($data, $txt, $xhr) {
+                       if($xhr.status == 204){
+                           location.reload();
+                       }else{
+                           $("#modal-container").html($data);
+                       }
                    });
                });
 
@@ -90,6 +97,7 @@
                     url:$link
                 }).done(function (data) {
                     $('#liste').html(data);
+                    $('#valid_supr').off("click");
                 });
             });
         }

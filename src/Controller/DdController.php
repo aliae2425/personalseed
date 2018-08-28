@@ -23,6 +23,10 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
+/**
+ * Class DdController
+ * @Route("/data")
+ */
 class DdController extends AbstractController
 {
 
@@ -31,7 +35,7 @@ class DdController extends AbstractController
      */
 
     /**
-     * @Route("/data", name="Data_HomePage")
+     * @Route("/", name="Data_HomePage")
      */
     public function Data_HomePage()
     {
@@ -43,7 +47,7 @@ class DdController extends AbstractController
      */
 
     /**
-     * @Route("/data/tag", name="Tag_homePage")
+     * @Route("/tag", name="Tag_homePage")
      */
     public function Tag_homepage(Request $request){
         $doc = $this->getDoctrine();
@@ -67,7 +71,7 @@ class DdController extends AbstractController
     }
 
     /**
-     * @Route("/data/tag/{id}/delete", name="Tag_delete", methods={"POST"})
+     * @Route("/tag/{id}/delete", name="Tag_delete", methods={"POST"})
      */
     public function Tag_Delete($id){
         $doc = $this->getDoctrine();
@@ -83,7 +87,7 @@ class DdController extends AbstractController
     }
 
     /**
-     * @Route("/data/tag/{id}/update", name="Tag_Update")
+     * @Route("/tag/{id}/update", name="Tag_Update")
      */
     public function Tag_Update($id , Request $request ){
         $em = $this->getDoctrine()->getManager();
@@ -114,45 +118,6 @@ class DdController extends AbstractController
     /*
      * ========== Photo ==========
      */
-    /**
-     * @Route("/data/photo", name="Photo_HomePage")
-     */
-    public function Photo_HomePage(Request $request){
-
-        $photo = new Photo();
-        var_dump(PhotoType::class);
-        $form = $this->createForm(PhotoType::class, $photo);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-
-            $doc = $this->getDoctrine();
-
-
-
-            /** @var UploadedFile */
-            $file = $photo->getFile();
-
-            $fileName = $this->generateUniqueFileName().'.'.$file->guessExtension();
-
-            $file->move(
-                $this->getParameter('Photo_directory'),
-                $fileName
-            );
-            $photo->setFile($fileName);
-
-            $em->persist($photo);
-            #$em->flush();
-
-
-            return new Response("coucou");
-
-        }
-
-        return $this->render('Data/Project/Photo_form.html.twig', array(
-            'form' => $form->createView(),
-        ));
-    }
 
     /**
      * @return string
@@ -163,7 +128,7 @@ class DdController extends AbstractController
     }
 
     /**
-     * @Route("/data/project", name="Project_HomePage")
+     * @Route("/project", name="Project_HomePage")
      */
     public function Project_HomePage(Request $request){
 
@@ -211,11 +176,48 @@ class DdController extends AbstractController
     }
 
     /**
-     * @Route("/data/project/{id}/zoom", name="Project_zoom")
+     * @Route("/project/{id}/zoom", name="Project_zoom")
      */
     public function Project_Zoom($id){
         $project = $this->getDoctrine()->getRepository(Project::class)->find($id);
         return $this->render("Data/Project/Project_Zoom.html.twig",["data"=>$project]);
+    }
+
+    /**
+     * @Route("/project/{id}/remove", name="Project_remove")
+     */
+    public function ProjetRemove($id){
+        $em = $this->getDoctrine()->getManager();
+        $project = $em->getRepository(Project::class)->find($id);
+        $name = $project->getName();
+        foreach ($project->getPhotos() as $photo){
+            $this->RemovePhoto($photo);
+        }
+        $em->remove($project);
+        $em->flush();
+
+        $data= $em->getRepository(Project::class)->findAll();
+
+        return $this->render("Data/Project/Project_liste.html.twig",["datas"=>$data]);
+    }
+
+    private function RemovePhoto($photo){
+        $em = $this->getDoctrine()->getManager();
+
+        unlink($this->getParameter('Photo_directory') . '/' . $photo->getFile());
+        $em->remove($photo);
+        $em->flush();
+    }
+
+    /**
+     * @Route("/project/{id}/updatePhotos", name="Project_update_photos", methods={"POST"})
+     */
+    public function ProjectUpdatePhoto($id) {
+        $em = $this->getDoctrine()->getManager();
+        $project = $em->getRepository(Project::class)->find($id);
+        $photos = $em->getRepository(Photo::class)->findBy(["project" => $project]);
+
+        return new Response('coucou');
     }
 
 }

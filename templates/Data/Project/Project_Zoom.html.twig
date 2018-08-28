@@ -6,10 +6,13 @@
             <h4 class="modal-title">{{ data.name }}</h4><h6 class="modal-title">{{ data.date|date("m/d/Y") }}</h6>
         </div>
         <div class="modal-body">
-            <p id="text_modal">{{ data.description }}</p>
-            <div class="photo">
+            <pre id="text_modal">{{ data.description }}</pre>
+            <div class="row
+            photo">
                 {% for photo in data.photos %}
-                <img src="{{ asset('uploads/Photo/' ~ photo.file) }}" class="rounded mx-auto d-block">
+                    <div class="col-md-4">
+                        <img src="{{ asset('uploads/Photo/' ~ photo.file) }}" class="rounded mx-auto d-block">
+                    </div>
                 {% endfor %}
             </div>
         </div>

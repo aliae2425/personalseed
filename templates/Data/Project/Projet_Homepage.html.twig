@@ -1,7 +1,7 @@
 {% extends "AdminLayout.html.twig" %}
 
 
-{% block card_title %} Gestionaire : Project <a class="text-right" href="#" data-toggle="modal" data-target="#form_modal"> <i class="now-ui-icons ui-1_simple-add"></i></a>{% endblock %}
+{% block card_title %} Gestionaire : Project <a class="text-right" href="#" data-toggle="modal" data-target="#modal"> <i class="now-ui-icons ui-1_simple-add"></i></a>{% endblock %}
 
 {% block body %}
 
@@ -43,9 +43,9 @@
                     <td>{{ data.photos|length}}</td>
                     <td class="text-right">
                         <a href="{{ path('Project_zoom',{'id' : data.id}) }}" class="zoom"> <i class="now-ui-icons ui-1_zoom-bold"></i></a>
-
                         <a href=""> <i class="now-ui-icons ui-1_settings-gear-63"></i></a>
-                        <a class="delete" href=""> <i class="now-ui-icons ui-1_simple-remove"></i></a>
+                        <a href=""> <i class="now-ui-icons ui-1_media-1_camera-compact"></i></a>
+                        <a class="delete" onclick="DepletedTag(this, event, '{{ data.name }}');" href="{{ path('Project_remove', {'id':data.id}) }}"> <i class="now-ui-icons ui-1_simple-remove"></i></a>
                     </td>
                 </tr>
             {% endfor %}
@@ -54,6 +54,8 @@
     </div>
 
 {% endblock %}
+
+
 
 
 {% block modal_body %}
@@ -90,10 +92,28 @@
                     url: $link
                 }).done(function ($data) {
                     console.log('done');
-                    $('#current_modal').html($data);
-                    $('#current_modal').modal();
+                    $('#modall').html($data);
+                    $('#modal').modal();
                 })
             })
         });
+
+        function DepletedTag($this, e, $name) {
+            e.preventDefault();
+            var $link = $($this).attr('href');
+            $('#text_modal').html("Voulez vous vraiment supprimer le projet : " + $name);
+            $('#modal').modal();
+            $('#valid_supr').click(function () {
+                console.log($link);
+                $('#liste').html('<td colspan="7"><img src="{{ asset('img/load.gif') }}" class="rounded mx-auto d-block" style="height: 50px;"></td>');
+                $.ajax({
+                    method: 'POST',
+                    url:$link
+                }).done(function (data) {
+                    $('#liste').html(data);
+                    $('#valid_supr').off("click");
+                });
+            });
+        }
     </script>
 {% endblock %}

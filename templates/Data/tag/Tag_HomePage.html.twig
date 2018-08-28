@@ -1,6 +1,6 @@
 {% extends 'AdminLayout.html.twig' %}
 
-{% block card_title %} Gestionaire : Tag <a class="text-right" href="#" data-toggle="modal" data-target="#form_modal"> <i class="now-ui-icons ui-1_simple-add"></i></a>{% endblock %}
+{% block card_title %} Gestionaire : Tag <a class="text-right" href="#" data-toggle="modal" data-target="#modal"> <i class="now-ui-icons ui-1_simple-add"></i></a>{% endblock %}
 
 {% block body %}
 
@@ -56,7 +56,7 @@
            }).done(function ($data){
                 console.log("done");
                 $("#modal-container").html($data);
-                $("#form_modal").modal();
+                $("#modal").modal();
 
 
                 // ========== form post =====
@@ -88,7 +88,7 @@
             e.preventDefault();
             var $link = $($this).attr('href');
             $('#text_modal').html("Voulez vous vraiment supprimer le tag : " + $name);
-            $('#current_modal').modal('toggle');
+            $('#modal').modal('toggle');
             $('#valid_supr').click(function () {
                 console.log($link);
                 $('#liste').html('<td colspan="4"><img src="{{ asset('img/load.gif') }}" class="rounded mx-auto d-block" style="height: 50px;"></td>');

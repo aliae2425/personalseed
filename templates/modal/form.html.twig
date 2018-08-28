@@ -1,0 +1,34 @@
+{{ form_start(form) }}
+<div class="modal-header">
+    <h4 class="modal-title"> {{ titre }}</h4>
+</div>
+<div class="modal-body">
+    {{ form_widget(form) }}
+</div>
+<div class="modal-footer">
+    <button name="submit" class="btn btn-success modal-submit">Valider</button>
+    <button id="modal-close" type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
+</div>
+{{ form_end(form) }}
+
+<script>
+
+    $("form").submit(function(e){
+        e.preventDefault();
+        let href = $(this).attr("action");
+        $.ajax({
+            method : "POST",
+            url: href,
+            data : $(this).serialize()
+        }).done(function ($data) {
+            if(typeof $data === 'object' && $data.state === 1) {
+                $('#modal-close').trigger('click');
+                console.log('maxime click');
+                $('.modal-content').html('');
+            }else{
+                $('.modal-content').html($data);
+            }
+        })
+    })
+
+</script>

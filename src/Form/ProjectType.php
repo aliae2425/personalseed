@@ -37,13 +37,13 @@ class ProjectType extends AbstractType
                 'label'=> 'Tag du projet',
                 'attr' => ['class' => 'form-control']
                 ])
-            ->add('files', FileType::class, [
+            /*->add('files', FileType::class, [
                 'data_class' => null,
                 'multiple' => 'true',
                 'label' => 'Photos du projet',
                 'attr' => ['class' => 'form-control']
 
-            ])
+            ])*/
         ;
     }
 

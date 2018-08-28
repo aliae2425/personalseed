@@ -1,7 +1,7 @@
 {% extends "AdminLayout.html.twig" %}
 
 
-{% block card_title %} Gestionaire : Project <a class="text-right" href="#" data-toggle="modal" data-target="#modal"> <i class="now-ui-icons ui-1_simple-add"></i></a>{% endblock %}
+{% block card_title %} Gestionaire : Project <a  class="add_button text-right" href="{{ path('Project_Create') }}"> <i class="now-ui-icons ui-1_simple-add"></i></a>{% endblock %}
 
 {% block body %}
 
@@ -45,7 +45,7 @@
                         <a href="{{ path('Project_zoom',{'id' : data.id}) }}" class="zoom"> <i class="now-ui-icons ui-1_zoom-bold"></i></a>
                         <a href=""> <i class="now-ui-icons ui-1_settings-gear-63"></i></a>
                         <a href=""> <i class="now-ui-icons ui-1_media-1_camera-compact"></i></a>
-                        <a class="delete" onclick="DepletedTag(this, event, '{{ data.name }}');" href="{{ path('Project_remove', {'id':data.id}) }}"> <i class="now-ui-icons ui-1_simple-remove"></i></a>
+                        <a class="delete" onclick="DeleteProject(this, event);" href="{{ path('Project_remove', {'id':data.id}) }}"> <i class="now-ui-icons ui-1_simple-remove"></i></a>
                     </td>
                 </tr>
             {% endfor %}
@@ -57,63 +57,60 @@
 
 
 
-
-{% block modal_body %}
-
-    {{ form_start(form) }}
-            <div class="modal-header">
-                <h4 class="modal-title">Nouveau Projet</h4>
-            </div>
-            <div class="modal-body">
-        {{ form_widget(form) }}
-            </div>
-            <div class="modal-footer">
-                <button id="submit" name="submit" class="btn btn-success">Valider</button>
-                <button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
-            </div>
-    {{ form_end(form) }}
-
-{% endblock %}
-
 {% block JS %}
     {{ parent() }}
     <script>
-        $(document).ready(function(){
+        $(document).ready(function() {
             console.log("ready");
 
-            var $supression = "<div class=\"modal-dialog\"><div class=\"modal-content\"><div class=\"modal-header\"><h4 class=\"modal-title\">Suppression</h4></div><div class=\"modal-body\"><p id=\"text_modal\">Some text in the modal.</p></div><div class=\"modal-footer\"><button type=\"button\" id=\"valid_supr\" class=\"btn btn-success\" data-dismiss=\"modal\">valider</button><button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Annuler</button></div></div></div>"
-
-            $(".zoom").click(function (e) {
-                console.log('click');
+            $(".add_button").click(function (e) {
                 e.preventDefault();
-                var $link = $(this).attr("href");
+                console.log('homepage');
+                let href = $(this).attr('href');
                 $.ajax({
-                    method: 'POST',
-                    url: $link
+                    method : "POST",
+                    url: href
                 }).done(function ($data) {
-                    console.log('done');
-                    $('#modall').html($data);
+                    $('.modal-content').html($data);
                     $('#modal').modal();
                 })
             })
+
         });
 
-        function DepletedTag($this, e, $name) {
+        function DeleteProject($this, e) {
             e.preventDefault();
-            var $link = $($this).attr('href');
-            $('#text_modal').html("Voulez vous vraiment supprimer le projet : " + $name);
-            $('#modal').modal();
-            $('#valid_supr').click(function () {
-                console.log($link);
-                $('#liste').html('<td colspan="7"><img src="{{ asset('img/load.gif') }}" class="rounded mx-auto d-block" style="height: 50px;"></td>');
-                $.ajax({
-                    method: 'POST',
-                    url:$link
-                }).done(function (data) {
-                    $('#liste').html(data);
-                    $('#valid_supr').off("click");
-                });
+            $.ajax({
+                method : 'POST',
+                url : $($this).attr('href')
+            }).done(function($data){
+                if(typeof $data === 'object' && $data.state === 1) {
+                    $('#modal-close').trigger('click');
+                    console.log("cigit click");
+                    $('.modal-content').html('');
+               }else{
+                   $('.modal-content').html($data);
+                   $('#modal').modal();
+                   $('.modal-submit').click(function(e){
+                       e.preventDefault();
+                       $.ajax({
+                           method : "POST",
+                           url: $(this).data('href'),
+                           data : {'confirm': 1},
+                       }).done(function ($data) {
+                           if(typeof $data === 'object' && $data.state === 1) {
+                               $('#modal-close').trigger('click');
+                               console.log("cigit prout");
+                               $('.modal-content').html('');
+                           }else {
+                               $('.modal-content').html("Erreur : veuillez recharger la page.");
+                           }
+                       })
+                   })
+               }
+
             });
         }
     </script>
 {% endblock %}
+

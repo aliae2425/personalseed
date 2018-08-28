@@ -1,6 +1,6 @@
 {% extends 'AdminLayout.html.twig' %}
 
-{% block card_title %} Gestionaire : Tag <a class="text-right" href="#" data-toggle="modal" data-target="#modal"> <i class="now-ui-icons ui-1_simple-add"></i></a>{% endblock %}
+{% block card_title %} Gestionaire : Tag <a class="text-right add_button" href="{{ path('Tag_Create') }}" > <i class="now-ui-icons ui-1_simple-add"></i></a>{% endblock %}
 
 {% block body %}
 
@@ -31,7 +31,7 @@
                 </td>
                 <td class="text-right">
                     <a onclick="UpdateTag(this, event);" href="{{ path('Tag_Update', {id:data.id}) }}"> <i class="now-ui-icons ui-1_settings-gear-63"></i></a>
-                    <a onclick="DepletedTag(this, event, '{{ data.name }}');" href="{{ path('Tag_delete',{id:data.id}) }}"> <i class="now-ui-icons ui-1_simple-remove"></i></a>
+                    <a onclick="DeleteTag(this, event);" href="{{ path('Tag_delete',{id:data.id}) }}"> <i class="now-ui-icons ui-1_simple-remove"></i></a>
                 </td>
             </tr>
             {% endfor %}
@@ -45,77 +45,52 @@
     {{ parent() }}
     <script>
 
-        function UpdateTag($this, e) {
-            var $link = $($this).attr("href");
-            console.log('update click');
-            console.info($link);
+        $(".add_button").click(function (e) {
             e.preventDefault();
-           $.ajax({
-                method: 'GET',
-                url: $link
-           }).done(function ($data){
-                console.log("done");
-                $("#modal-container").html($data);
-                $("#modal").modal();
-
-
-                // ========== form post =====
-
-               $("form").submit(function(event){
-                   event.preventDefault();
-                   console.log(event);
-                   stop();
-                   var datas= $( this ).serialize();
-                   var target = $(this).attr("action");
-                   $.ajax({
-                       method : 'POST',
-                       url: target,
-                       data: datas
-                   }).done(function ($data, $txt, $xhr) {
-                       if($xhr.status == 204){
-                           location.reload();
-                       }else{
-                           $("#modal-container").html($data);
-                       }
-                   });
-               });
-
-
+            let $link = $(this).attr("href");
+            $.ajax({
+                method: "POST",
+                url : $link
+            }).done(function ($data) {
+                console.log($data);
+                $('#modal-content').html($data);
+                $('#modal').modal('toggle');
             });
-        }
+        })
 
-        function DepletedTag($this, e, $name) {
+        function DeleteTag($this, e) {
             e.preventDefault();
-            var $link = $($this).attr('href');
-            $('#text_modal').html("Voulez vous vraiment supprimer le tag : " + $name);
-            $('#modal').modal('toggle');
-            $('#valid_supr').click(function () {
-                console.log($link);
-                $('#liste').html('<td colspan="4"><img src="{{ asset('img/load.gif') }}" class="rounded mx-auto d-block" style="height: 50px;"></td>');
-                $.ajax({
-                    method: 'POST',
-                    url:$link
-                }).done(function (data) {
-                    $('#liste').html(data);
-                    $('#valid_supr').off("click");
-                });
+            $.ajax({
+                method: 'POST',
+                url: $($this).attr('href')
+            }).done(function ($data) {
+                if (typeof $data === 'object' && $data.state === 1) {
+                    $('#modal-close').trigger('click');
+                    console.log("cigit click");
+                    $('.modal-content').html('');
+                } else {
+                    $('.modal-content').html($data);
+                    $('#modal').modal();
+                    $('.modal-submit').click(function (e) {
+                        e.preventDefault();
+                        $.ajax({
+                            method: "POST",
+                            url: $(this).data('href'),
+                            data: {'confirm': 1},
+                        }).done(function ($data) {
+                            if (typeof $data === 'object' && $data.state === 1) {
+                                $('#modal-close').trigger('click');
+                                console.log("cigit prout");
+                                $('.modal-content').html('');
+                            } else {
+                                $('.modal-content').html("Erreur : veuillez recharger la page.");
+                            }
+                        })
+                    })
+                }
+
             });
         }
 
     </script>
-{% endblock %}
-
-{% block modal_body %}
-    {{ form_start(form) }}
-    <div class="modal-header">
-        <h4 class="modal-title">Nouveau Tag</h4>
-    </div>
-    <div class="modal-body">
-        {{ form_widget(form) }}
-    </div>
-    <div class="modal-footer">
-        <button id="submit" name="submit" class="btn btn-success">Valider</button>
-        <button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
-    </div>
-    {{ form_end(form) }}
 {% endblock %}

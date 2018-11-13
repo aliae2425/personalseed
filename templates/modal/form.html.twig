@@ -25,6 +25,7 @@
                 $('#modal-close').trigger('click');
                 console.log('maxime click');
                 $('.modal-content').html('');
+                $("table").trigger('table-update', [$data.object, $data.id]);
             }else{
                 $('.modal-content').html($data);
             }

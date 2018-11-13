@@ -5,7 +5,7 @@
 {% block body %}
 
     <div class="table-responsive">
-        <table class="table">
+        <table class="table table-tag">
             <thead class=" text-primary">
             <tr>
                 <th>
@@ -23,14 +23,14 @@
             </tr></thead>
             <tbody id="liste">
             {% for data in datas %}
-            <tr>
-                <td>{{ data.id }}</td>
-                <td>{{ data.name }}</td>
-                <td>
+            <tr  data-id="{{ data.id }}">
+                <td class="tag-id">{{ data.id }}</td>
+                <td class="tag-name">{{ data.name }}</td>
+                <td class="tag-etat">
                     {% if data.etat %} <i class="now-ui-icons ui-1_check"></i> {% endif %}
                 </td>
                 <td class="text-right">
-                    <a onclick="UpdateTag(this, event);" href="{{ path('Tag_Update', {id:data.id}) }}"> <i class="now-ui-icons ui-1_settings-gear-63"></i></a>
+                    <a onclick="TagUpdate(this, event);" href="{{ path('Tag_Update', {id:data.id}) }}"> <i class="now-ui-icons ui-1_settings-gear-63"></i></a>
                     <a onclick="DeleteTag(this, event);" href="{{ path('Tag_delete',{id:data.id}) }}"> <i class="now-ui-icons ui-1_simple-remove"></i></a>
                 </td>
             </tr>
@@ -45,6 +45,16 @@
     {{ parent() }}
     <script>
 
+        $(document).ready(function(){
+            $("table").on('table-update',function (e, $tr, $id) {
+                if($(this).find('tr').filter('[data-id="'+$id+ '"]').length > 0 ){
+                    $(this).find('tr').filter('[data-id="'+$id+ '"]').html($tr);
+                }else{
+                    $(this).append('<tr data-id="' + $id +'">' + $tr + '</tr>');
+                }
+            })
+        });
+
         $(".add_button").click(function (e) {
             e.preventDefault();
             let $link = $(this).attr("href");
@@ -53,10 +63,23 @@
                 url : $link
             }).done(function ($data) {
                 console.log($data);
-                $('#modal-content').html($data);
+                $('.modal-content').html($data);
                 $('#modal').modal('toggle');
             });
-        })
+        });
+
+        function TagUpdate($this, e){
+            e.preventDefault();
+            let $link = $($this).attr("href");
+            $.ajax({
+                method: "POST",
+                url : $link
+            }).done(function ($data) {
+                console.log($data);
+                $('.modal-content').html($data);
+                $('#modal').modal('toggle');
+            });
+        }
 
         function DeleteTag($this, e) {
             e.preventDefault();

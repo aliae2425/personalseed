@@ -112,4 +112,8 @@ class Tag
 
         return $this;
     }
+
+    public function toSerializable(){
+        return (object) get_object_vars($this);
+    }
 }

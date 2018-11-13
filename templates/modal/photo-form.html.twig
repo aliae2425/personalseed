@@ -1,0 +1,62 @@
+{{ form_start(form) }}
+<div class="modal-header">
+    <h4 class="modal-title"> Photo du projet </h4>
+</div>
+<div class="modal-body modal-lg">
+    <div class="dropzone">
+
+        <div class="hidden">
+            {{ form_widget(form) }}
+        </div>
+
+        <div class="dz-preview">
+            {%  for photo in photos %}{% endfor %}
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button name="submit" class="btn btn-success modal-submit">Valider</button>
+    <button id="modal-close" type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
+</div>
+{{ form_end(form) }}
+
+<script>
+    $(document).ready(function () {
+
+        $(".dropzone").dropzone({
+            url: '{{ path('Project_update_photos',{'id':id}) }}',
+            autoProcessQueue: false,
+            addRemoveLinks: true,
+            uploadMultiple: true,
+            parallelUploads: 100,
+            maxFiles: 100,
+            paramName: "file",
+            previewsContainer: '.dz-preview',
+            init : function () {
+                console.log('init');
+            }
+        });
+
+        $("form").submit(function(e){
+            e.preventDefault();
+            let href = $(this).attr("action");
+            console.log('_1');
+            console.log($('form[name="frmSave"]'));
+            $.ajax({
+                method : "POST",
+                url: href,
+                data : $(this).serialize()
+            }).done(function ($data) {
+                if(typeof $data === 'object' && $data.state === 1) {
+                    $('#modal-close').trigger('click');
+                    $('.modal-content').html('');
+                    $("table").trigger('table-update', [$data.object, $data.id]);
+                }else{
+                    $('.modal-content').html($data);
+                }
+            })
+        });
+
+    })
+
+</script>

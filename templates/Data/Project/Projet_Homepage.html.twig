@@ -1,5 +1,9 @@
 {% extends "AdminLayout.html.twig" %}
 
+{% block css %}
+    {{ parent() }}
+    <link href="{{ asset('css/dropzone.css') }}" rel="stylesheet">
+{% endblock %}
 
 {% block card_title %} Gestionaire : Project <a  class="add_button text-right" href="{{ path('Project_Create') }}"> <i class="now-ui-icons ui-1_simple-add"></i></a>{% endblock %}
 
@@ -44,7 +48,7 @@
                     <td class="text-right">
                         <a href="{{ path('Project_zoom',{'id' : data.id}) }}" class="zoom"> <i class="now-ui-icons ui-1_zoom-bold"></i></a>
                         <a href=""> <i class="now-ui-icons ui-1_settings-gear-63"></i></a>
-                        <a href=""> <i class="now-ui-icons ui-1_media-1_camera-compact"></i></a>
+                        <a onclick="UpdatePhoto(this, event);" href="{{ path('Project_update_photos', {'id':data.id} )}}"> <i class="now-ui-icons media-1_camera-compact"></i></a>
                         <a class="delete" onclick="DeleteProject(this, event);" href="{{ path('Project_remove', {'id':data.id}) }}"> <i class="now-ui-icons ui-1_simple-remove"></i></a>
                     </td>
                 </tr>
@@ -59,6 +63,7 @@
 
 {% block JS %}
     {{ parent() }}
+    <script src="{{ asset('dropzone.js') }}"></script>
     <script>
         $(document).ready(function() {
             console.log("ready");
@@ -77,6 +82,19 @@
             })
 
         });
+
+        function UpdatePhoto($this, e) {
+            e.preventDefault();
+            console.log('homepage');
+            let href = $($this).attr('href');
+            $.ajax({
+                method : "POST",
+                url: href
+            }).done(function ($data) {
+                $('.modal-content').html($data);
+                $('#modal').modal();
+            })
+        }
 
         function DeleteProject($this, e) {
             e.preventDefault();

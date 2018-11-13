@@ -40,7 +40,7 @@ class TagController extends AbstractController
     }
 
 
-    //pas d'affichage
+    //ok
     /**
      * @Route("/create", name="Tag_Create", methods={"POST"})
      */
@@ -58,11 +58,11 @@ class TagController extends AbstractController
             $em->persist($tag);
             $em->flush();
 
-            return new JsonResponse(["state"=>1, 'confirm'=>1]);
+            return new JsonResponse(["state"=>1, 'confirm'=>1, 'object'=>$this->renderTagTr($tag), 'id'=>$tag->getId()]);
 
         }
 
-        return $this->render("modal/form.html.twig", ['titre'=>'Tag','form' => $form->createView()]);
+        return $this->render("modal/form.html.twig", ['titre'=>'Créer nouveau tag','form' => $form->createView()]);
     }
 
     //ok
@@ -88,9 +88,9 @@ class TagController extends AbstractController
         }
     }
 
-    //pas test
+    //ok
     /**
-     * @Route("/{id}/update", name="Tag_Update")
+     * @Route("/{id}/update", name="Tag_Update", methods={"POST"})
      */
     public function Tag_Update($id , Request $request ){
         $em = $this->getDoctrine()->getManager();
@@ -110,10 +110,14 @@ class TagController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()){
             $em->flush();
-            return new Response('', Response::HTTP_NO_CONTENT);
+            return new JsonResponse(["state"=>1, 'confirm'=>1, 'object'=>$this->renderTagTr($tag), 'id'=>$tag->getId()]);
         }
 
-        return $this->render("Data/tag/Tag_Update.html.twig", ['form'=>$form->createView()]);
+        return $this->render("modal/form.html.twig", ['titre'=>'modifier : ' . $tag->getName(), 'form'=>$form->createView()]);
     }
 
+    private function renderTagTr($tag){
+
+        return $this->get("twig")->render("Data/tag/Tag_liste.html.twig", [ 'data' => $tag ]);
+    }
 }

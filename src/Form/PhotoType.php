@@ -17,7 +17,8 @@ class PhotoType extends AbstractType
         $builder
             ->add('file', FileType::class, [
                     'multiple'=>'true',
-                    'label' => 'Photo'
+                    'label' => 'Photo',
+                    'attr'=>array('novalidate'=>'novalidate')
                     ]
             )
         ;

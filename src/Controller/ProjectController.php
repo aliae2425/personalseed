@@ -13,6 +13,7 @@ namespace App\Controller;
 use App\Entity\Photo;
 use App\Entity\Project;
 
+use App\Form\PhotoType;
 use App\Form\ProjectType;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -74,27 +75,6 @@ class ProjectController extends AbstractController
         return $this->render('modal/form.html.twig', ['titre'=> "projet", 'form'=>$form->createView()]);
     }
 
-    //to complete
-    /**
-     * @Route("/{id}/photo/add", name="Photo_add", methods={"POST"})
-     */
-    public function Photo_Create(Request $request, $id){
-        $em = $this->getDoctrine()->getManager();
-
-        $form = $this->get("form.factory")
-            ->create(ProjectType::class,
-                ['action'=> $this->generateUrl("Project_Create")]
-            );
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-
-        }
-
-        return $this->render('modal/form.html.twig', ['titre'=> "photo", 'form'=>$form->createView()]);
-
-    }
-
     //pas test
     /**
      * @Route("/{id}/zoom", name="Project_zoom")
@@ -131,7 +111,7 @@ class ProjectController extends AbstractController
 
     }
 
-    //to do
+    //ok
     private function RemovePhoto($photo){
         $em = $this->getDoctrine()->getManager();
 
@@ -140,16 +120,47 @@ class ProjectController extends AbstractController
         $em->flush();
     }
 
+    /*
+     * @param File $photo
+     */
+    private function AddPhoto($photo, $project){
+        $current = new Photo();
+
+
+        $fileName = $this->generateUniqueFileName().'.'.$file->guessExtension();
+
+        $file->move(
+            $this->getParameter('brochures_directory'),
+            $fileName
+        );
+
+
+
+    }
+
     //to do
     /**
      * @Route("/{id}/updatePhotos", name="Project_update_photos", methods={"POST"})
      */
-    public function ProjectUpdatePhoto($id) {
+    public function ProjectUpdatePhoto($id, Request $request) {
         $em = $this->getDoctrine()->getManager();
         $project = $em->getRepository(Project::class)->find($id);
-        $photos = $em->getRepository(Photo::class)->findBy(["project" => $project]);
+        $photos = $em->getRepository(Photo::class)->findBy(["Project" => $project]);
 
-        return new Response('coucou');
+
+        $form = $this->get("form.factory")
+            ->create(PhotoType::class, new Photo(),
+                ['action'=> $this->generateUrl("Project_update_photos", ['id'=>$id])]
+            );
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            var_dump($request->request->get('photos'));
+            return new JsonResponse(["state"=>1, 'confirm'=>1]);
+        }
+
+        return $this->render('modal/photo-form.html.twig', ["photos"=>$photos, 'id'=>$id, "form"=>$form->createView()]);
     }
 
 

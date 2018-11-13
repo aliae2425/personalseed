@@ -1,13 +1,12 @@
-{% for data in datas %}
-<tr>
+
+
     <td>{{ data.id }}</td>
     <td>{{ data.name }}</td>
     <td>
         {% if data.etat %} <i class="now-ui-icons ui-1_check"></i> {% endif %}
     </td>
     <td class="text-right">
-        <a onclick="UpdateTag(this, event);" href="{{ path('Tag_Update', {id:data.id}) }}"> <i class="now-ui-icons ui-1_settings-gear-63"></i></a>
-        <a onclick="DepletedTag(this, event, '{{ data.name }}');" href="{{ path('Tag_delete',{id:data.id}) }}"> <i class="now-ui-icons ui-1_simple-remove"></i></a>
+        <a onclick="TagUpdate(this, event);" href="{{ path('Tag_Update', {id:data.id}) }}"> <i class="now-ui-icons ui-1_settings-gear-63"></i></a>
+        <a onclick="DeleteTag(this, event);" href="{{ path('Tag_delete',{id:data.id}) }}"> <i class="now-ui-icons ui-1_simple-remove"></i></a>
     </td>
-</tr>
-{% endfor %}
+
